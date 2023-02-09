@@ -16,7 +16,10 @@ struct blockPostParams {
     params: (String, bool),
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+struct blockResponse {
 
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -52,8 +55,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await?;
 
     let resp_formatted:Value = serde_json::from_str(&resp)?;
+    let resp_result = serde_json::from_value::<Value>(resp_formatted["result"].clone()).unwrap();
 
-    println!("{:?}", resp_formatted);
+    let res = resp_result["gasUsed"].as_str().unwrap();
+
+    println!("{:?}", res);
 
     // for i in (last_block-10..last_block) {
     //     let blockParams = blockPostParams {
