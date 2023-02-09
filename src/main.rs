@@ -45,28 +45,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     
 
     for i in (last_block-10..last_block) {
-        let hex_block = format!("{:x}", i);
+        let hex_block = format!("{i:#x}");
+        // println!("{}", hex_block);
 
         let blockParams = blockPostParams {
             id: "1".into(),
             jsonrpc: "2.0".into(),
             method: "eth_getBlockByNumber".into(),
-            params: (hex_block.into(), false)
+            params: (hex_block.as_str().into(), false)
         };
-        println!("{:?}", blockParams);
+        // println!("{:?}", blockParams);
         let resp = client.post("https://eth-mainnet.g.alchemy.com/v2/api_key")
             .json(&blockParams)
             .send()
             .await?
             .text()
             .await?;
+
+        // println!("{:?}", resp);
     
         let resp_formatted:Value = serde_json::from_str(&resp)?;
         let resp_result = serde_json::from_value::<Value>(resp_formatted["result"].clone()).unwrap();
     
         let res = resp_result["gasUsed"].as_str().unwrap();
+        let gasUsed = u64::from_str_radix(res.trim_start_matches("0x"), 16).unwrap();
     
-        println!("{:?}", res);
+        println!("Block_no: {}, gas used: {}", i, gasUsed);
     }
 
     
