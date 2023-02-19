@@ -1,6 +1,5 @@
 use ethers::prelude::*;
 use ethers_providers::{Provider, Http, Middleware};
-use ethers_core::types::{u64};
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use std::env;
@@ -42,10 +41,12 @@ async fn main() {
     let last_block = provider.get_block_number().await.unwrap();
 
     for i in 0..last_block.as_u64() {
-        let block_no = i.to_string().as_str();
-        let null_bal = provider.get_balance(null_add, block_no);
-
-
+        let block_no = ethers_core::types::BlockId::from(i);
+        let null_bal = provider.get_balance(null_add, Some(block_no)).await;
+        println!("Null_bal: {:?}", null_bal);
+        let null_bal_res = null_bal.unwrap();
+        
+        println!("Balance at {}: {}", i, null_bal_res);
     }
 
     let block_res = provider.get_block(last_block).await;
