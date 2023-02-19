@@ -40,13 +40,20 @@ async fn main() {
 
     let last_block = provider.get_block_number().await.unwrap();
 
-    for i in 0..last_block.as_u64() {
+    for i in (49164..last_block.as_u64()).step_by(1000) {
         let block_no = ethers_core::types::BlockId::from(i);
         let null_bal = provider.get_balance(null_add, Some(block_no)).await;
-        println!("Null_bal: {:?}", null_bal);
-        let null_bal_res = null_bal.unwrap();
         
-        println!("Balance at {}: {}", i, null_bal_res);
+        match null_bal {
+            Ok(T) => {
+                // let null_bal_res = null_bal.unwrap();
+                println!("Balance at {}: {}", i, T)
+            },
+            Err(T) => {println!("Balance at {}: ?", i)}
+        }
+        
+        
+        
     }
 
     let block_res = provider.get_block(last_block).await;
