@@ -4,24 +4,26 @@ use serde::{Serialize, Deserialize};
 use serde_json::Value;
 use std::env;
 use std::fmt::LowerHex;
-use std::ptr::null;
 
-// async fn get_provider(provider: &str, key: &str) -> Option<Provider>{
+async fn get_provider(provider: &str, key: &str) -> Option<Provider<Http>>{
 
-//     let prov = provider.to_lowercase().as_str();
+    let prov = provider.to_lowercase();
 
-//     let url = match prov {
-//         "infura" => format!("https://mainnet.infura.io/v3/{}", key).to_string(),
-//         _ => None 
-//     };
+    let url = match prov.as_str() {
+        "infura" => {
+            let path = format!("https://mainnet.infura.io/v3/{}", key).to_string();
+            Provider::<Http>::try_from(path)
+        },
+        _ => 
+    };
 
-//     match url {
-//         Some(T) => Provider::<Http>::try_from(url),
-//         _ => None
-//     }
+    match url {
+        Ok(provider) => Some(provider),
+        Err(_) => None
+    }
 
     
-// }
+}
 
 // async fn get_balance(addr: &str, block_no: Option<)
 
@@ -34,16 +36,18 @@ async fn main() {
     ).unwrap();
 
     let null_add = "0x0000000000000000000000000000000000000000";
+    let poloniex_add = "0x32Be343B94f860124dC4fEe278FDCBD38C102D88";
 
     // let provider = get_provider("Infura", &infura_api).await.unwrap();
 
 
     let last_block = provider.get_block_number().await.unwrap();
 
-    for i in (49164..last_block.as_u64()).step_by(1000) {
+    for i in ((last_block.as_u64()-20)..last_block.as_u64()) {
         let block_no = ethers_core::types::BlockId::from(i);
-        let null_bal = provider.get_balance(null_add, Some(block_no)).await;
-        
+        println!("{:?}", block_no);
+        let null_bal = provider.get_balance(poloniex_add, None).await;
+        println!("{:?}", null_bal);
         match null_bal {
             Ok(T) => {
                 // let null_bal_res = null_bal.unwrap();
